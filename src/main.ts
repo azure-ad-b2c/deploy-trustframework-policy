@@ -26,7 +26,7 @@ async function main() {
       .api(`trustFramework/policies/${policy}/$value`)
       .putStream(fileStream);
 
-    core.info('Wrote policy using Microsoft Graph: ' + response);
+    core.info('Wrote policy using Microsoft Graph');
   } catch (error) {
     let errorText = error.message ?? error;
     core.error('Action failed: ' + errorText);
