@@ -22,7 +22,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: 'Upload TrustFrameworkBase Policy'
-      uses: azure-ad-b2c/deploy-trustframework-policy@master
+      uses: azure-ad-b2c/deploy-trustframework-policy@v1
       with:
         file: "./Policies/TrustFrameworkBase.xml"
         policy: TrustFrameworkBase
@@ -31,7 +31,7 @@ jobs:
         clientSecret: ${{ secrets.clientSecret }}
 
     - name: Upload TrustFrameworkExtensions Policy
-      uses: azure-ad-b2c/deploy-trustframework-policy@master
+      uses: azure-ad-b2c/deploy-trustframework-policy@v1
       with:
         file: "./Policies/TrustFrameworkExtensions.xml"
         policy: TrustFrameworkExtensions
@@ -40,7 +40,7 @@ jobs:
         clientSecret: ${{ secrets.clientSecret }}
 
     - name: Upload SignUpOrSignin Policy
-      uses: azure-ad-b2c/deploy-trustframework-policy@master
+      uses: azure-ad-b2c/deploy-trustframework-policy@v1
       with:
         file: "./Policies/SignUpOrSignin.xml"
         policy: SignUpOrSignin
