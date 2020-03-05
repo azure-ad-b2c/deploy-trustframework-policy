@@ -1,6 +1,6 @@
 const core = require('@actions/core');
 const fs = require('fs');
-import 'node-fetch';
+(global as any).fetch = require('node-fetch'); // Polyfill for graph client
 import { Client } from '@microsoft/microsoft-graph-client';
 import { ClientCredentialsAuthProvider } from './auth';
 

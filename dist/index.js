@@ -5900,7 +5900,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __webpack_require__(470);
 const fs = __webpack_require__(747);
-__webpack_require__(454);
+global.fetch = __webpack_require__(454); // Polyfill for graph client
 const microsoft_graph_client_1 = __webpack_require__(590);
 const auth_1 = __webpack_require__(827);
 function main() {
