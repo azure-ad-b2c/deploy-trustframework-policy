@@ -1,10 +1,25 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Deploy TrustFramework Policy'
+description: 'A GitHub Action for deploying TrustFramework policies using the Microsoft Graph. The policy will be created if it does not exist or replaced if it already exists.'
+author: 'Adam Stoffel'
+branding:
+  icon: 'code'
+  color: 'blue'
 inputs:
-  myInput:              # change this
-    description: 'input description here'
-    default: 'default value if applicable'
+  file:
+    description: 'The path to the TrustFramework Policy XML file to upload'
+    required: true
+  policy:
+    description: 'The TrustFramework Policy name'
+    required: true
+  tenant:
+    description: 'The full Azure AD B2C tenant name (e.g.: mytenant.onmicrosoft.com) or GUID'
+    required: true
+  clientId:
+    description: 'The Client ID for a service principal which will be used to authenticate to the Microsoft Graph'
+    required: true
+  clientSecret:
+    description: 'The Client Secret for a service principal which will be used to authenticate to the Microsoft Graph'
+    required: true
 runs:
   using: 'node12'
   main: 'dist/index.js'

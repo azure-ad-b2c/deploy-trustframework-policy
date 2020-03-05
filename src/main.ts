@@ -1,19 +1,37 @@
-import * as core from '@actions/core'
-import {wait} from './wait'
+const core = require('@actions/core');
+const fs = require('fs');
+import 'node-fetch';
+import { Client } from '@microsoft/microsoft-graph-client';
+import { ClientCredentialsAuthProvider } from './auth';
 
-async function run(): Promise<void> {
+async function main() {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    const file = core.getInput('file');
+    const policy = core.getInput('policy');
+    const tenant = core.getInput('tenant');
+    const clientId = core.getInput('clientId');
+    const clientSecret = core.getInput('clientSecret');
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    let client = Client.initWithMiddleware({
+      authProvider: new ClientCredentialsAuthProvider(
+        tenant,
+        clientId,
+        clientSecret
+      ),
+      defaultVersion: 'beta'
+    });
 
-    core.setOutput('time', new Date().toTimeString())
+    let fileStream = fs.createReadStream(file);
+    let response = await client
+      .api(`trustFramework/policies/${policy}/$value`)
+      .putStream(fileStream);
+
+    core.info('Wrote policy using Microsoft Graph: ' + response);
   } catch (error) {
-    core.setFailed(error.message)
+    let errorText = error.message ?? error;
+    core.error('Action failed: ' + errorText);
+    core.setFailed();
   }
 }
 
-run()
+main();
