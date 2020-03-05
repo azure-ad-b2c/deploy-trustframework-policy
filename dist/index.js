@@ -5920,7 +5920,7 @@ function main() {
             let response = yield client
                 .api(`trustFramework/policies/${policy}/$value`)
                 .putStream(fileStream);
-            core.info('Wrote policy using Microsoft Graph: ' + response);
+            core.info('Wrote policy using Microsoft Graph');
         }
         catch (error) {
             let errorText = (_a = error.message, (_a !== null && _a !== void 0 ? _a : error));

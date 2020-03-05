@@ -1,5 +1,5 @@
-name: 'Deploy TrustFramework Policy'
-description: 'A GitHub Action for deploying TrustFramework policies using the Microsoft Graph. The policy will be created if it does not exist or replaced if it already exists.'
+name: 'Deploy Azure AD B2C TrustFramework Policy'
+description: 'A GitHub Action for deploying TrustFramework policies using the Microsoft Graph'
 author: 'Adam Stoffel'
 branding:
   icon: 'code'
