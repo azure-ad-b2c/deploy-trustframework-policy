@@ -25,7 +25,7 @@ jobs:
       uses: azure-ad-b2c/deploy-trustframework-policy@v1
       with:
         file: "./Policies/TrustFrameworkBase.xml"
-        policy: TrustFrameworkBase
+        policy: B2C_1A_TrustFrameworkBase
         tenant: ${{ env.tenant }}
         clientId: ${{ env.clientId }}
         clientSecret: ${{ secrets.clientSecret }}
@@ -34,7 +34,7 @@ jobs:
       uses: azure-ad-b2c/deploy-trustframework-policy@v1
       with:
         file: "./Policies/TrustFrameworkExtensions.xml"
-        policy: TrustFrameworkExtensions
+        policy: B2C_1A_TrustFrameworkExtensions
         tenant: ${{ env.tenant }}
         clientId: ${{ env.clientId }}
         clientSecret: ${{ secrets.clientSecret }}
@@ -43,7 +43,7 @@ jobs:
       uses: azure-ad-b2c/deploy-trustframework-policy@v1
       with:
         file: "./Policies/SignUpOrSignin.xml"
-        policy: SignUpOrSignin
+        policy: B2C_1A_SignUpOrSignin
         tenant: ${{ env.tenant }}
         clientId: ${{ env.clientId }}
         clientSecret: ${{ secrets.clientSecret }}
