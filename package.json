@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "A GitHub Action for deploying TrustFramework policies using the Microsoft Graph",
-  "main": "lib/main.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "pack": "ncc build",
