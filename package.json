@@ -14,7 +14,7 @@
   "dependencies": {
     "@actions/core": "^1.2.0",
     "@microsoft/microsoft-graph-client": "^2.0.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "openid-client": "^3.14.0"
   },
   "devDependencies": {
