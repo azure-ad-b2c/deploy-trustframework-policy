@@ -1,24 +1,24 @@
-name: 'Deploy Azure AD B2C TrustFramework Policy'
-description: 'A GitHub Action for deploying TrustFramework policies using the Microsoft Graph'
-author: 'Adam Stoffel'
+name: 'Deploy Azure AD B2C custom policy'
+description: 'A GitHub Action for deploying Azure AD B2C policies using the Microsoft Graph API'
+author: 'Azure AD B2C GitHub Community'
 branding:
   icon: 'code'
   color: 'blue'
 inputs:
-  file:
-    description: 'The path to the TrustFramework Policy XML file to upload'
+  folder:
+    description: 'The folder where the custom policies files are stored'
     required: true
-  policy:
-    description: 'The TrustFramework Policy name'
+  files:
+    description: 'Comma delimiter list of policy files'
     required: true
   tenant:
-    description: 'The full Azure AD B2C tenant name (e.g.: mytenant.onmicrosoft.com) or GUID'
+    description: 'The full Azure AD B2C tenant name (for example, contoso.onmicrosoft.com) or GUID'
     required: true
   clientId:
-    description: 'The Client ID for a service principal which will be used to authenticate to the Microsoft Graph'
+    description: 'The application Client ID for a service principal which will be used to authenticate to the Microsoft Graph'
     required: true
   clientSecret:
-    description: 'The Client Secret for a service principal which will be used to authenticate to the Microsoft Graph'
+    description: 'The application Secret for a service principal which will be used to authenticate to the Microsoft Graph'
     required: true
 runs:
   using: 'node12'

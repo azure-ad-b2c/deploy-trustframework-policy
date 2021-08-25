@@ -1,25 +1,46 @@
 {
-  "name": "deploy-trustframework-policy",
+  "name": "typescript-action",
   "version": "0.0.0",
   "private": true,
-  "description": "A GitHub Action for deploying TrustFramework policies using the Microsoft Graph",
-  "main": "dist/index.js",
+  "description": "TypeScript template action",
+  "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
-    "pack": "ncc build",
-    "all": "npm run build && npm run pack"
+    "format": "prettier --write **/*.ts",
+    "format-check": "prettier --check **/*.ts",
+    "lint": "eslint src/**/*.ts",
+    "package": "ncc build --source-map --license licenses.txt",
+    "test": "jest",
+    "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
   },
-  "author": "Adam Stoffel",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/actions/typescript-action.git"
+  },
+  "keywords": [
+    "actions",
+    "node",
+    "setup"
+  ],
+  "author": "",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.2.0",
-    "@microsoft/microsoft-graph-client": "^2.0.0",
-    "node-fetch": "^2.6.0",
-    "openid-client": "^3.14.0"
+    "@actions/core": "^1.5.0",
+    "@microsoft/microsoft-graph-client": "^3.0.0",
+    "node-fetch": "^2.6.1",
+    "openid-client": "^4.7.4"
   },
   "devDependencies": {
-    "@types/node": "^12.7.12",
-    "@zeit/ncc": "^0.20.5",
-    "typescript": "^3.6.4"
+    "@types/node": "^16.3.3",
+    "@typescript-eslint/parser": "^4.29.3",
+    "@vercel/ncc": "^0.29.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-github": "^4.2.0",
+    "eslint-plugin-jest": "^24.3.6",
+    "jest": "^27.0.6",
+    "js-yaml": "^4.1.0",
+    "prettier": "2.3.2",
+    "ts-jest": "^27.0.3",
+    "typescript": "^4.1.3"
   }
 }
