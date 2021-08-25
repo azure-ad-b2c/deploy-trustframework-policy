@@ -26,10 +26,10 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
 
     - name: 'Upload TrustFrameworkBase Policy'
-      uses: azure-ad-b2c/deploy-trustframework-policy@v2
+      uses: azure-ad-b2c/deploy-trustframework-policy@v3
       with:
         folder: "./Policies"
         files: "TrustFrameworkBase.xml,TrustFrameworkExtensions.xml,SignUpOrSignin.xml"
