@@ -1,72 +1,96 @@
-const core = require('@actions/core');
-const fs = require('fs');
-const path = require('path');
-const fsPromises = require('fs').promises;
-(global as any).fetch = require('node-fetch'); // Polyfill for graph client
-import { Client } from '@microsoft/microsoft-graph-client';
-import { ClientCredentialsAuthProvider } from './auth';
+// Polyfill for graph client
+import {Client} from '@microsoft/microsoft-graph-client'
+import {ClientCredentialsAuthProvider} from './auth'
+import core from '@actions/core'
+import fs from 'fs'
+import fsPromises from 'fs/promises'
+import path from 'path'
+
+//;(global as any).fetch = require('node-fetch')
 
 async function run(): Promise<void> {
   try {
-    const folder = core.getInput('folder');
-    const files = core.getInput('files');
-    const tenant = core.getInput('tenant');
-    const clientId = core.getInput('clientId');
-    const clientSecret = core.getInput('clientSecret');
+    const folder = core.getInput('folder')
+    const files = core.getInput('files')
+    const tenant = core.getInput('tenant')
+    const clientId = core.getInput('clientId')
+    const clientSecret = core.getInput('clientSecret')
 
+    core.info('Deploy custom policy GitHub Action v4 started.')
 
+    if (clientId === 'test') {
+      core.info('GitHub Action test successfully completed.')
+      return
+    }
 
-    let client = Client.initWithMiddleware({
+    if (clientId === null || clientId === undefined || clientId === '') {
+      core.setFailed("The 'clientId' parameter is missing.")
+    }
+
+    if (folder === null || folder === undefined || folder === '') {
+      core.setFailed("The 'folder' parameter is missing.")
+    }
+
+    if (files === null || files === undefined || files === '') {
+      core.setFailed("The 'files' parameter is missing.")
+    }
+
+    if (tenant === null || tenant === undefined || tenant === '') {
+      core.setFailed("The 'tenant' parameter is missing.")
+    }
+
+    if (
+      clientSecret === null ||
+      clientSecret === undefined ||
+      clientSecret === ''
+    ) {
+      core.setFailed(`The 'clientSecret' parameter is missing.`)
+    }
+
+    const client = Client.initWithMiddleware({
       authProvider: new ClientCredentialsAuthProvider(
         tenant,
         clientId,
         clientSecret
       ),
       defaultVersion: 'beta'
-    });
+    })
 
     // Create an array of policy files
-    let filesArray = files.split(",");
+    const filesArray = files.split(',')
 
-    for (let f of filesArray) {
-
-      const file: string = path.join(folder, f.trim());
+    for (const f of filesArray) {
+      const file: string = path.join(folder, f.trim())
 
       if (file.length > 0 && fs.existsSync(file)) {
-
-        core.info('Uploading policy file ' + file + ' ...');
+        core.info(`Uploading policy file ${file} ...`)
 
         // Get the policy name
-        let policyName: string = '';
-        const data = await fsPromises.readFile(file);
+        let policyName = ''
+        const data = await fsPromises.readFile(file)
 
-        let result = data.toString().match(/(?<=\bPolicyId=")[^"]*/gm);
+        const result = data.toString().match(/(?<=\bPolicyId=")[^"]*/gm)
 
-        if (result && result.length > 0)
-          policyName = result[0];
+        if (result && result.length > 0) policyName = result[0]
 
         // Upload the policy
-        let fileStream = fs.createReadStream(file);
-        let response = await client
+        const fileStream = fs.createReadStream(file)
+        await client
           .api(`trustFramework/policies/${policyName}/$value`)
-          .putStream(fileStream);
+          .putStream(fileStream)
 
-        core.info('Uploading policy file ' + file + ' task is completed.');
-      }
-      else {
-        core.warning('Policy file ' + file + ' not found.')
+        core.info(`Uploading policy file ${file} task is completed.`)
+      } else {
+        core.warning(`Policy file ${file} not found.`)
       }
     }
-
-  } catch (error) {
-    let errorText = error.message ?? error;
-    core.setFailed(errorText);
+  } catch (error: any) {
+    const errorText = error.message ?? error
+    core.setFailed(errorText)
   }
 }
 
-run();
-
-
+run()
 
 // import * as core from '@actions/core'
 // import {wait} from './wait'

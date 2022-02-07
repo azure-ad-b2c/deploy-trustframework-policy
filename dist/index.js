@@ -24,10 +24,10 @@ class ClientCredentialsAuthProvider {
         this.clientSecret = clientSecret;
         this.scopes = scopes;
         this.cachedToken = null;
-        this.authClient = openid_client_1.Issuer.discover(`https://login.microsoftonline.com/${tenant}/v2.0/.well-known/openid-configuration`).then((issuer) => {
-            let client = new issuer.Client({
+        this.authClient = openid_client_1.Issuer.discover(`https://login.microsoftonline.com/${tenant}/v2.0/.well-known/openid-configuration`).then(issuer => {
+            const client = new issuer.Client({
                 client_id: clientId,
-                client_secret: clientSecret,
+                client_secret: clientSecret
             });
             return client;
         });
@@ -39,7 +39,7 @@ class ClientCredentialsAuthProvider {
                 yield this.acquireNewToken();
             }
             if (!((_a = this.cachedToken) === null || _a === void 0 ? void 0 : _a.access_token)) {
-                throw Error("Failed to acquire an authentication token.");
+                throw Error('Failed to acquire an authentication token.');
             }
             return this.cachedToken.access_token;
         });
@@ -47,16 +47,16 @@ class ClientCredentialsAuthProvider {
     acquireNewToken() {
         return __awaiter(this, void 0, void 0, function* () {
             this.cachedToken = yield (yield this.authClient).grant({
-                grant_type: "client_credentials",
+                grant_type: 'client_credentials',
                 client_id: this.clientId,
                 client_secret: this.clientSecret,
-                scope: this.scopes.join(" "),
+                scope: this.scopes.join(' ')
             });
         });
     }
 }
 exports.ClientCredentialsAuthProvider = ClientCredentialsAuthProvider;
-ClientCredentialsAuthProvider.defaultScope = "https://graph.microsoft.com/.default";
+ClientCredentialsAuthProvider.defaultScope = 'https://graph.microsoft.com/.default';
 
 
 /***/ }),
@@ -92,12 +92,32 @@ function run() {
             const tenant = core.getInput('tenant');
             const clientId = core.getInput('clientId');
             const clientSecret = core.getInput('clientSecret');
+            core.info('Deploy custom policy GitHub Action v4.2 started.');
+            if (clientId === 'test') {
+                core.info("GitHub Action test successfully completed.");
+                return;
+            }
+            if (clientId === null || clientId === undefined || clientId === '') {
+                core.setFailed("The 'clientId' parameter is missing.");
+            }
+            if (folder === null || folder === undefined || folder === '') {
+                core.setFailed("The 'folder' parameter is missing.");
+            }
+            if (files === null || files === undefined || files === '') {
+                core.setFailed("The 'files' parameter is missing.");
+            }
+            if (tenant === null || tenant === undefined || tenant === '') {
+                core.setFailed("The 'tenant' parameter is missing.");
+            }
+            if (clientSecret === null || clientSecret === undefined || clientSecret === '') {
+                core.setFailed("The 'clientSecret' parameter is missing.");
+            }
             let client = microsoft_graph_client_1.Client.initWithMiddleware({
                 authProvider: new auth_1.ClientCredentialsAuthProvider(tenant, clientId, clientSecret),
                 defaultVersion: 'beta'
             });
             // Create an array of policy files
-            let filesArray = files.split(",");
+            let filesArray = files.split(',');
             for (let f of filesArray) {
                 const file = path.join(folder, f.trim());
                 if (file.length > 0 && fs.existsSync(file)) {
