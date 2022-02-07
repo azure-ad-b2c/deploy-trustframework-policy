@@ -3,8 +3,8 @@ import {Client} from '@microsoft/microsoft-graph-client'
 import {ClientCredentialsAuthProvider} from './auth'
 import core from '@actions/core'
 import fs from 'fs'
-import fsPromises from 'fs/promises'
 import path from 'path'
+const fsPromises = require('fs').promises
 
 //;(global as any).fetch = require('node-fetch')
 

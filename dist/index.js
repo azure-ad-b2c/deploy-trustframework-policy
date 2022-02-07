@@ -84,8 +84,8 @@ const microsoft_graph_client_1 = __nccwpck_require__(9989);
 const auth_1 = __nccwpck_require__(9725);
 const core_1 = __importDefault(__nccwpck_require__(2186));
 const fs_1 = __importDefault(__nccwpck_require__(5747));
-const promises_1 = __importDefault(__nccwpck_require__(9225));
 const path_1 = __importDefault(__nccwpck_require__(5622));
+const fsPromises = __nccwpck_require__(5747).promises;
 //;(global as any).fetch = require('node-fetch')
 function run() {
     var _a;
@@ -130,7 +130,7 @@ function run() {
                     core_1.default.info(`Uploading policy file ${file} ...`);
                     // Get the policy name
                     let policyName = '';
-                    const data = yield promises_1.default.readFile(file);
+                    const data = yield fsPromises.readFile(file);
                     const result = data.toString().match(/(?<=\bPolicyId=")[^"]*/gm);
                     if (result && result.length > 0)
                         policyName = result[0];
@@ -17753,14 +17753,6 @@ module.exports = require("events");
 
 "use strict";
 module.exports = require("fs");
-
-/***/ }),
-
-/***/ 9225:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("fs/promises");
 
 /***/ }),
 
