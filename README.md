@@ -20,7 +20,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: 'Upload TrustFrameworkBase Policy'
-      uses: azure-ad-b2c/deploy-trustframework-policy@main
+      uses: azure-ad-b2c/deploy-trustframework-policy@v4
       with:
         folder: "./Policies"
         files: "TrustFrameworkBase.xml,TrustFrameworkExtensions.xml,SignUpOrSignin.xml"
