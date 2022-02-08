@@ -1,11 +1,11 @@
-import { Issuer, Client, TokenSet } from "openid-client";
-import { AuthenticationProvider } from "@microsoft/microsoft-graph-client";
+import { Client, Issuer, TokenSet } from "openid-client"
+import { AuthenticationProvider } from "@microsoft/microsoft-graph-client"
 
 export class ClientCredentialsAuthProvider implements AuthenticationProvider {
-  private static defaultScope = "https://graph.microsoft.com/.default";
+  private static defaultScope = "https://graph.microsoft.com/.default"
 
-  private authClient: Promise<Client>;
-  private cachedToken: TokenSet | null = null;
+  private authClient: Promise<Client>
+  private cachedToken: TokenSet | null = null
 
   constructor(
     tenant: string,
@@ -16,24 +16,24 @@ export class ClientCredentialsAuthProvider implements AuthenticationProvider {
     this.authClient = Issuer.discover(
       `https://login.microsoftonline.com/${tenant}/v2.0/.well-known/openid-configuration`
     ).then((issuer) => {
-      let client = new issuer.Client({
+      const client = new issuer.Client({
         client_id: clientId,
         client_secret: clientSecret,
-      });
-      return client;
-    });
+      })
+      return client
+    })
   }
 
-  public async getAccessToken(): Promise<string> {
+  async getAccessToken(): Promise<string> {
     if (!this.cachedToken || this.cachedToken.expired()) {
-      await this.acquireNewToken();
+      await this.acquireNewToken()
     }
 
     if (!this.cachedToken?.access_token) {
-      throw Error("Failed to acquire an authentication token.");
+      throw Error("Failed to acquire an authentication token.")
     }
 
-    return this.cachedToken.access_token;
+    return this.cachedToken.access_token
   }
 
   private async acquireNewToken() {
@@ -42,6 +42,6 @@ export class ClientCredentialsAuthProvider implements AuthenticationProvider {
       client_id: this.clientId,
       client_secret: this.clientSecret,
       scope: this.scopes.join(" "),
-    });
+    })
   }
 }
