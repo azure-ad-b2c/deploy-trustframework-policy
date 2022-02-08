@@ -6,6 +6,7 @@ const path = require('path')
 const fsPromises = require('fs').promises;
 (global as any).fetch = require('node-fetch')
 const Readable = require('stream').Readable
+const fg = require('fast-glob')
 
 async function run(): Promise<void> {
   try {
@@ -53,7 +54,12 @@ async function run(): Promise<void> {
     })
 
     // Create an array of policy files
-    const filesArray = files.split(",")
+    let filesArray = files.split(",")
+
+    if (files === "*")
+    {
+      filesArray = await fg([  `${folder}/**/*.xml`], { dot: true })
+    }
 
     for (const f of filesArray) {
 

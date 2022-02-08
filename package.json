@@ -27,6 +27,7 @@
   "dependencies": {
     "@actions/core": "^1.5.0",
     "@microsoft/microsoft-graph-client": "^3.0.0",
+    "fast-glob": "^3.2.11",
     "node-fetch": "^2.6.1",
     "openid-client": "^4.7.4"
   },
