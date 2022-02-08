@@ -14,7 +14,33 @@ async function run(): Promise<void> {
     const clientId = core.getInput('clientId');
     const clientSecret = core.getInput('clientSecret');
 
+    core.info('Deploy custom policy GitHub Action v5.b started.')
 
+    if (clientId === 'test') {
+      core.info('GitHub Action test successfully completed.')
+      return
+    }
+
+    if (clientId === null || clientId === undefined || clientId === '') {
+      core.setFailed("The 'clientId' parameter is missing.")
+    }
+
+    if (folder === null || folder === undefined || folder === '') {
+      core.setFailed("The 'folder' parameter is missing.")
+    }
+
+    if (files === null || files === undefined || files === '') {
+      core.setFailed("The 'files' parameter is missing.")
+    }
+
+    if (tenant === null || tenant === undefined || tenant === '') {
+      core.setFailed("The 'tenant' parameter is missing.")
+    }
+
+    if ( clientSecret === null || clientSecret === undefined || clientSecret === ''
+    ) {
+      core.setFailed(`The 'clientSecret' parameter is missing.`)
+    }
 
     let client = Client.initWithMiddleware({
       authProvider: new ClientCredentialsAuthProvider(
@@ -58,7 +84,7 @@ async function run(): Promise<void> {
       }
     }
 
-  } catch (error) {
+  } catch (error: any) {
     let errorText = error.message ?? error;
     core.setFailed(errorText);
   }
