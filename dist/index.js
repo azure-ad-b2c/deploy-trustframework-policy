@@ -94,7 +94,7 @@ function run() {
             const tenant = core.getInput('tenant');
             const clientId = core.getInput('clientId');
             const clientSecret = core.getInput('clientSecret');
-            core.info('Deploy custom policy GitHub Action v5c2 started.');
+            core.info('Deploy custom policy GitHub Action v5c3 started.');
             if (clientId === 'test') {
                 core.info('GitHub Action test successfully completed.');
                 return;
@@ -123,7 +123,6 @@ function run() {
             for (const f of filesArray) {
                 const filePath = path.join(folder, f.trim());
                 if (filePath.length > 0 && fs.existsSync(filePath)) {
-                    core.info(`Uploading policy file ${filePath} ...`);
                     // Get the policy name
                     let policyName = '';
                     const policyFile = yield fsPromises.readFile(filePath);
@@ -133,9 +132,10 @@ function run() {
                         policyName = result[0];
                     // Replace yourtenant.onmicrosoft.com with the tenant name parameter
                     if (policyXML.indexOf("yourtenant.onmicrosoft.com") > 0) {
-                        core.info(`Replace yourtenant.onmicrosoft.com with ${tenant}.`);
+                        core.info(`Replace ${filePath} yourtenant.onmicrosoft.com with ${tenant}.`);
                         policyXML = policyXML.replace(new RegExp("yourtenant.onmicrosoft.com", "gi"), tenant);
                     }
+                    core.info(`Uploading policy file ${filePath} ...`);
                     const fileStream = new Readable();
                     fileStream.push(policyXML);
                     fileStream.push(null); // Indicates end of file/stream
