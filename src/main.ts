@@ -14,7 +14,7 @@ async function run(): Promise<void> {
     const clientId = core.getInput('clientId')
     const clientSecret = core.getInput('clientSecret')
 
-    core.info('Deploy custom policy GitHub Action v5c started.')
+    core.info('Deploy custom policy GitHub Action v5c1 started.')
 
     if (clientId === 'test') {
       core.info('GitHub Action test successfully completed.')
