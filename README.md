@@ -2,7 +2,16 @@
 
 Use this GitHub Action to deploy an [Azure AD B2C custom policy](https://docs.microsoft.com/azure/active-directory-b2c/custom-policy-overview) into your Azure Active Directory B2C tenant using the [Microsoft Graph API](https://docs.microsoft.com/graph/api/resources/trustframeworkpolicy?view=graph-rest-beta). If the policy does not yet exist, it will be created. If the policy already exists, it will be replaced.
 
-For more information, see [Deploy Azure AD B2C custom policy with GitHub actions](https://docs.microsoft.com/azure/active-directory-b2c/deploy-custom-policies-github-action).
+Microsoft Graph allows you to manage many of the resources within your Azure AD B2C tenant, including customer user accounts and custom policies. Before your scripts and applications can interact with the Microsoft Graph API to manage Azure AD B2C resources, you need to create an application registration in your Azure AD B2C tenant that grants the required API permissions.
+
+To create an MS Graph application, follow these steps:
+
+1. Follow the guidance [how to register management application](https://docs.microsoft.com/azure/active-directory-b2c/microsoft-graph-get-started).
+1. Take a note on the application client ID you registered. 
+1. [Grant API access](https://docs.microsoft.com/azure/active-directory-b2c/microsoft-graph-get-started?tabs=app-reg-ga#grant-api-access), and make sure to select `Policy.ReadWrite.TrustFramework`.
+1. [Create client secret](https://docs.microsoft.com/azure/active-directory-b2c/microsoft-graph-get-started?tabs=app-reg-ga#create-client-secret).
+
+For more information, see [Deploy Azure AD B2C custom policy with GitHub actions](https://docs.microsoft.com/azure/active-directory-b2c/deploy-custom-policy-github-action).
 
 ## Sample workflow to deploy custom policies
 
