@@ -16,7 +16,7 @@ async function run(): Promise<void> {
     const clientId = core.getInput('clientId')
     const clientSecret = core.getInput('clientSecret')
 
-    core.info('Deploy custom policy GitHub Action v5c4 started.')
+    core.info('Deploy custom policy GitHub Action v5 started.')
 
     if (clientId === 'test') {
       core.info('GitHub Action test successfully completed.')
@@ -90,26 +90,25 @@ async function run(): Promise<void> {
         // Replace yourtenant.onmicrosoft.com with the tenant name parameter
         if (policyXML.indexOf("yourtenant.onmicrosoft.com") >0)
         {
-          core.info(`Replace ${ filePath } yourtenant.onmicrosoft.com with ${ tenant }.`)
+          core.info(`Policy ${ filePath } replacing yourtenant.onmicrosoft.com with ${ tenant }.`)
           policyXML = policyXML.replace(new RegExp("yourtenant.onmicrosoft.com", "gi"), tenant)
         }  
 
-        core.info(`Uploading policy file ${  filePath  } ...`)
+        core.info(`Policy ${ filePath } uploading...`)
 
         const fileStream = new Readable()
         fileStream.push(policyXML)   
         fileStream.push(null)      // Indicates end of file/stream
 
         // Upload the policy
-        //const fileStream = fs.createReadStream(filePath)
         const response = await client
           .api(`trustFramework/policies/${policyName}/$value`)
           .putStream(fileStream)
 
-        core.info(`Uploading policy file ${  filePath  } task is completed.`)
+        core.info(`Policy ${  filePath  } successfully uploaded.`)
       }
       else {
-        core.warning(`Policy file ${  filePath  } not found.`)
+        core.warning(`Policy ${  filePath  } not found.`)
       }
     }
 
