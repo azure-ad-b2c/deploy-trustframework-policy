@@ -25,7 +25,7 @@ class ClientCredentialsAuthProvider {
         this.scopes = scopes;
         this.cachedToken = null;
         this.authClient = openid_client_1.Issuer.discover(`https://login.microsoftonline.com/${tenant}/v2.0/.well-known/openid-configuration`).then((issuer) => {
-            let client = new issuer.Client({
+            const client = new issuer.Client({
                 client_id: clientId,
                 client_secret: clientSecret,
             });
@@ -76,13 +76,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+// Polyfill for graph client
+const microsoft_graph_client_1 = __nccwpck_require__(9989);
+const auth_1 = __nccwpck_require__(9725);
 const core = __nccwpck_require__(2186);
 const fs = __nccwpck_require__(5747);
 const path = __nccwpck_require__(5622);
 const fsPromises = __nccwpck_require__(5747).promises;
-global.fetch = __nccwpck_require__(467); // Polyfill for graph client
-const microsoft_graph_client_1 = __nccwpck_require__(9989);
-const auth_1 = __nccwpck_require__(9725);
+global.fetch = __nccwpck_require__(467);
 function run() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
@@ -112,36 +113,36 @@ function run() {
             if (clientSecret === null || clientSecret === undefined || clientSecret === '') {
                 core.setFailed(`The 'clientSecret' parameter is missing.`);
             }
-            let client = microsoft_graph_client_1.Client.initWithMiddleware({
+            const client = microsoft_graph_client_1.Client.initWithMiddleware({
                 authProvider: new auth_1.ClientCredentialsAuthProvider(tenant, clientId, clientSecret),
                 defaultVersion: 'beta'
             });
             // Create an array of policy files
-            let filesArray = files.split(",");
-            for (let f of filesArray) {
+            const filesArray = files.split(",");
+            for (const f of filesArray) {
                 const file = path.join(folder, f.trim());
                 if (file.length > 0 && fs.existsSync(file)) {
-                    core.info('Uploading policy file ' + file + ' ...');
+                    core.info(`Uploading policy file ${file} ...`);
                     // Get the policy name
                     let policyName = '';
                     const data = yield fsPromises.readFile(file);
-                    let result = data.toString().match(/(?<=\bPolicyId=")[^"]*/gm);
+                    const result = data.toString().match(/(?<=\bPolicyId=")[^"]*/gm);
                     if (result && result.length > 0)
                         policyName = result[0];
                     // Upload the policy
-                    let fileStream = fs.createReadStream(file);
-                    let response = yield client
+                    const fileStream = fs.createReadStream(file);
+                    const response = yield client
                         .api(`trustFramework/policies/${policyName}/$value`)
                         .putStream(fileStream);
-                    core.info('Uploading policy file ' + file + ' task is completed.');
+                    core.info(`Uploading policy file ${file} task is completed.`);
                 }
                 else {
-                    core.warning('Policy file ' + file + ' not found.');
+                    core.warning(`Policy file ${file} not found.`);
                 }
             }
         }
         catch (error) {
-            let errorText = (_a = error.message) !== null && _a !== void 0 ? _a : error;
+            const errorText = (_a = error.message) !== null && _a !== void 0 ? _a : error;
             core.setFailed(errorText);
         }
     });
