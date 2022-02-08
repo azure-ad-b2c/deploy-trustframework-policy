@@ -64,12 +64,19 @@ async function run(): Promise<void> {
 
         // Get the policy name
         let policyName = ''
-        const data = await fsPromises.readFile(file)
+        let policyFile = await fsPromises.readFile(file)
 
-        const result = data.toString().match(/(?<=\bPolicyId=")[^"]*/gm)
+        const result = policyFile.match(/(?<=\bPolicyId=")[^"]*/gm)
 
         if (result && result.length > 0)
           policyName = result[0]
+
+        // Replace yourtenant.onmicrosoft.com with the tenant name parameter
+        if (policyFile.indexOf("yourtenant.onmicrosoft.com") >0)
+        {
+          core.info(`Replace yourtenant.onmicrosoft.com with ${ tenant }.`)
+          policyFile = policyFile.replace(new RegExp("\yourtenant.onmicrosoft.com", "gi"), tenant);
+        }  
 
         // Upload the policy
         const fileStream = fs.createReadStream(file)
