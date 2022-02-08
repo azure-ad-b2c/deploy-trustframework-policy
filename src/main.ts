@@ -16,7 +16,7 @@ async function run(): Promise<void> {
     const clientId = core.getInput('clientId')
     const clientSecret = core.getInput('clientSecret')
 
-    core.info('Deploy custom policy GitHub Action v5c3 started.')
+    core.info('Deploy custom policy GitHub Action v5c4 started.')
 
     if (clientId === 'test') {
       core.info('GitHub Action test successfully completed.')
@@ -63,7 +63,17 @@ async function run(): Promise<void> {
 
     for (const f of filesArray) {
 
-      const filePath: string = path.join(folder, f.trim())
+      let filePath = ''
+      
+      if (files === "*")
+      {
+        filePath = f.trim()
+      }
+      else
+      {
+        filePath = path.join(folder, f.trim())
+      }
+      
 
       if (filePath.length > 0 && fs.existsSync(filePath)) {
 

@@ -95,7 +95,7 @@ function run() {
             const tenant = core.getInput('tenant');
             const clientId = core.getInput('clientId');
             const clientSecret = core.getInput('clientSecret');
-            core.info('Deploy custom policy GitHub Action v5c3 started.');
+            core.info('Deploy custom policy GitHub Action v5c4 started.');
             if (clientId === 'test') {
                 core.info('GitHub Action test successfully completed.');
                 return;
@@ -125,7 +125,13 @@ function run() {
                 filesArray = yield fg([`${folder}/**/*.xml`], { dot: true });
             }
             for (const f of filesArray) {
-                const filePath = path.join(folder, f.trim());
+                let filePath = '';
+                if (files === "*") {
+                    filePath = f.trim();
+                }
+                else {
+                    filePath = path.join(folder, f.trim());
+                }
                 if (filePath.length > 0 && fs.existsSync(filePath)) {
                     // Get the policy name
                     let policyName = '';
