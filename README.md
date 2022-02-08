@@ -68,7 +68,7 @@ The GitHub build runs the scrips as described above. The `lint` script runs the 
     "no-unused-vars": "off",
 ```
 
-### Run test
+### Test the action
 
 When you commit a change to any branch or a PR, the [test.yml](.github/workflows/test.yml) workflow runs with `clientId` parameter set to `test`. The `test` value indicates to the GitHub Action to exit the test successfully. We exit the test because because the  required parameters are not configured in this repo.
 
