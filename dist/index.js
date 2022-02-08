@@ -84,6 +84,7 @@ const fs = __nccwpck_require__(5747);
 const path = __nccwpck_require__(5622);
 const fsPromises = __nccwpck_require__(5747).promises;
 global.fetch = __nccwpck_require__(467);
+const Readable = __nccwpck_require__(2413).Readable;
 function run() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
@@ -93,7 +94,7 @@ function run() {
             const tenant = core.getInput('tenant');
             const clientId = core.getInput('clientId');
             const clientSecret = core.getInput('clientSecret');
-            core.info('Deploy custom policy GitHub Action v5c1 started.');
+            core.info('Deploy custom policy GitHub Action v5c2 started.');
             if (clientId === 'test') {
                 core.info('GitHub Action test successfully completed.');
                 return;
@@ -120,29 +121,33 @@ function run() {
             // Create an array of policy files
             const filesArray = files.split(",");
             for (const f of filesArray) {
-                const file = path.join(folder, f.trim());
-                if (file.length > 0 && fs.existsSync(file)) {
-                    core.info(`Uploading policy file ${file} ...`);
+                const filePath = path.join(folder, f.trim());
+                if (filePath.length > 0 && fs.existsSync(filePath)) {
+                    core.info(`Uploading policy file ${filePath} ...`);
                     // Get the policy name
                     let policyName = '';
-                    let policyFile = yield fsPromises.readFile(file);
-                    const result = policyFile.match(/(?<=\bPolicyId=")[^"]*/gm);
+                    const policyFile = yield fsPromises.readFile(filePath);
+                    let policyXML = policyFile.toString();
+                    const result = policyXML.match(/(?<=\bPolicyId=")[^"]*/gm);
                     if (result && result.length > 0)
                         policyName = result[0];
                     // Replace yourtenant.onmicrosoft.com with the tenant name parameter
-                    if (policyFile.indexOf("yourtenant.onmicrosoft.com") > 0) {
+                    if (policyXML.indexOf("yourtenant.onmicrosoft.com") > 0) {
                         core.info(`Replace yourtenant.onmicrosoft.com with ${tenant}.`);
-                        policyFile = policyFile.replace(new RegExp("\yourtenant.onmicrosoft.com", "gi"), tenant);
+                        policyXML = policyXML.replace(new RegExp("yourtenant.onmicrosoft.com", "gi"), tenant);
                     }
+                    const fileStream = new Readable();
+                    fileStream.push(policyXML);
+                    fileStream.push(null); // Indicates end of file/stream
                     // Upload the policy
-                    const fileStream = fs.createReadStream(file);
+                    //const fileStream = fs.createReadStream(filePath)
                     const response = yield client
                         .api(`trustFramework/policies/${policyName}/$value`)
                         .putStream(fileStream);
-                    core.info(`Uploading policy file ${file} task is completed.`);
+                    core.info(`Uploading policy file ${filePath} task is completed.`);
                 }
                 else {
-                    core.warning(`Policy file ${file} not found.`);
+                    core.warning(`Policy file ${filePath} not found.`);
                 }
             }
         }

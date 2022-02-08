@@ -5,6 +5,7 @@ const fs = require('fs')
 const path = require('path')
 const fsPromises = require('fs').promises;
 (global as any).fetch = require('node-fetch')
+const Readable = require('stream').Readable
 
 async function run(): Promise<void> {
   try {
@@ -14,7 +15,7 @@ async function run(): Promise<void> {
     const clientId = core.getInput('clientId')
     const clientSecret = core.getInput('clientSecret')
 
-    core.info('Deploy custom policy GitHub Action v5c1 started.')
+    core.info('Deploy custom policy GitHub Action v5c2 started.')
 
     if (clientId === 'test') {
       core.info('GitHub Action test successfully completed.')
@@ -56,38 +57,43 @@ async function run(): Promise<void> {
 
     for (const f of filesArray) {
 
-      const file: string = path.join(folder, f.trim())
+      const filePath: string = path.join(folder, f.trim())
 
-      if (file.length > 0 && fs.existsSync(file)) {
+      if (filePath.length > 0 && fs.existsSync(filePath)) {
 
-        core.info(`Uploading policy file ${  file  } ...`)
+        core.info(`Uploading policy file ${  filePath  } ...`)
 
         // Get the policy name
         let policyName = ''
-        let policyFile = await fsPromises.readFile(file)
+        const policyFile = await fsPromises.readFile(filePath)
+        let policyXML = policyFile.toString()
 
-        const result = policyFile.match(/(?<=\bPolicyId=")[^"]*/gm)
+        const result = policyXML.match(/(?<=\bPolicyId=")[^"]*/gm)
 
         if (result && result.length > 0)
           policyName = result[0]
 
         // Replace yourtenant.onmicrosoft.com with the tenant name parameter
-        if (policyFile.indexOf("yourtenant.onmicrosoft.com") >0)
+        if (policyXML.indexOf("yourtenant.onmicrosoft.com") >0)
         {
           core.info(`Replace yourtenant.onmicrosoft.com with ${ tenant }.`)
-          policyFile = policyFile.replace(new RegExp("\yourtenant.onmicrosoft.com", "gi"), tenant);
+          policyXML = policyXML.replace(new RegExp("yourtenant.onmicrosoft.com", "gi"), tenant)
         }  
 
+        const fileStream = new Readable()
+        fileStream.push(policyXML)   
+        fileStream.push(null)      // Indicates end of file/stream
+
         // Upload the policy
-        const fileStream = fs.createReadStream(file)
+        //const fileStream = fs.createReadStream(filePath)
         const response = await client
           .api(`trustFramework/policies/${policyName}/$value`)
           .putStream(fileStream)
 
-        core.info(`Uploading policy file ${  file  } task is completed.`)
+        core.info(`Uploading policy file ${  filePath  } task is completed.`)
       }
       else {
-        core.warning(`Policy file ${  file  } not found.`)
+        core.warning(`Policy file ${  filePath  } not found.`)
       }
     }
 
