@@ -29,7 +29,8 @@
     "@microsoft/microsoft-graph-client": "^3.0.0",
     "fast-glob": "^3.2.11",
     "node-fetch": "^2.6.1",
-    "openid-client": "^4.7.4"
+    "openid-client": "^4.7.4",
+    "xmldom": "^0.6.0"
   },
   "devDependencies": {
     "@types/node": "^16.7.1",
@@ -37,7 +38,7 @@
     "@vercel/ncc": "^0.29.2",
     "eslint": "^7.32.0",
     "eslint-plugin-github": "^4.2.0",
-    "eslint-plugin-jest": "^24.4.0",
+    "eslint-plugin-jest": "^26.1.1",
     "jest": "^27.0.6",
     "js-yaml": "^4.1.0",
     "prettier": "2.3.2",
