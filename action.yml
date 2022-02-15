@@ -20,6 +20,12 @@ inputs:
   clientSecret:
     description: 'The application Secret for a service principal which will be used to authenticate to the Microsoft Graph'
     required: true
+  renumberSteps:
+    description: 'Renumber the orchestration steps. Possible values: true, or false'
+    required: false
+  addAppInsightsStep:
+    description: 'Add App Insights orchestration steps to the the user journeys.'
+    required: false
 runs:
   using: 'node12'
   main: 'dist/index.js'
