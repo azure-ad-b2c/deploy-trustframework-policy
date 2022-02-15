@@ -112,7 +112,7 @@ async function run(): Promise<void> {
       }
     }
 
-  } catch (error) {
+  } catch (error: any) {
     const errorText = error.message ?? error
     core.setFailed(errorText)
   }
