@@ -8,6 +8,9 @@ const fsPromises = require('fs').promises;
 const Readable = require('stream').Readable
 const fg = require('fast-glob')
 
+// XML parsing
+const { DOMParser } = require('xmldom')
+
 async function run(): Promise<void> {
   try {
     const folder = core.getInput('folder')
@@ -15,8 +18,11 @@ async function run(): Promise<void> {
     const tenant = core.getInput('tenant')
     const clientId = core.getInput('clientId')
     const clientSecret = core.getInput('clientSecret')
+    const addAppInsightsStep = core.getInput('addAppInsightsStep')
+    const renumberSteps = core.getInput('renumberSteps')
 
-    core.info('Deploy custom policy GitHub Action v5 started.')
+
+    core.info('Deploy custom policy GitHub Action v5.1 started.')
 
     if (clientId === 'test') {
       core.info('GitHub Action test successfully completed.')
@@ -56,24 +62,20 @@ async function run(): Promise<void> {
     // Create an array of policy files
     let filesArray = files.split(",")
 
-    if (files === "*")
-    {
-      filesArray = await fg([  `${folder}/**/*.xml`], { dot: true })
+    if (files === "*") {
+      filesArray = await fg([`${folder}/**/*.xml`], { dot: true })
     }
 
     for (const f of filesArray) {
 
       let filePath = ''
-      
-      if (files === "*")
-      {
+
+      if (files === "*") {
         filePath = f.trim()
       }
-      else
-      {
+      else {
         filePath = path.join(folder, f.trim())
       }
-      
 
       if (filePath.length > 0 && fs.existsSync(filePath)) {
 
@@ -88,16 +90,23 @@ async function run(): Promise<void> {
           policyName = result[0]
 
         // Replace yourtenant.onmicrosoft.com with the tenant name parameter
-        if (policyXML.indexOf("yourtenant.onmicrosoft.com") >0)
-        {
-          core.info(`Policy ${ filePath } replacing yourtenant.onmicrosoft.com with ${ tenant }.`)
+        if (policyXML.indexOf("yourtenant.onmicrosoft.com") > 0) {
+          //core.info(`Policy ${filePath} replacing yourtenant.onmicrosoft.com with ${tenant}.`)
           policyXML = policyXML.replace(new RegExp("yourtenant.onmicrosoft.com", "gi"), tenant)
-        }  
+        }
 
-        core.info(`Policy ${ filePath } uploading...`)
+        // Add Azure AppInsights orchestration step at the begging of the collection
+        if (addAppInsightsStep !== null && addAppInsightsStep !== undefined || addAppInsightsStep === true) {
+          policyXML = addAppInsightsOrchestrationStep(policyXML)
+        }
+
+        // Renumber the orchestration steps
+        if (renumberSteps !== null && renumberSteps !== undefined || renumberSteps === true) {
+          policyXML = renumberOrchestrationSteps(policyXML)
+        }
 
         const fileStream = new Readable()
-        fileStream.push(policyXML)   
+        fileStream.push(policyXML)
         fileStream.push(null)      // Indicates end of file/stream
 
         // Upload the policy
@@ -105,10 +114,10 @@ async function run(): Promise<void> {
           .api(`trustFramework/policies/${policyName}/$value`)
           .putStream(fileStream)
 
-        core.info(`Policy ${  filePath  } successfully uploaded.`)
+        core.info(`Policy ${filePath} successfully uploaded.`)
       }
       else {
-        core.warning(`Policy ${  filePath  } not found.`)
+        core.warning(`Policy ${filePath} not found.`)
       }
     }
 
@@ -116,6 +125,49 @@ async function run(): Promise<void> {
     const errorText = error.message ?? error
     core.setFailed(errorText)
   }
+}
+
+function addAppInsightsOrchestrationStep(xmlStringDocument: string) {
+
+  const xmlDoc = new DOMParser().parseFromString(xmlStringDocument, "application/xml")
+
+  const ParentOrchestrationSteps = xmlDoc.getElementsByTagName("OrchestrationSteps")
+  for (let i = 0; i < ParentOrchestrationSteps.length; i++) {
+    //<OrchestrationStep Order="1" Type="ClaimsExchange"><ClaimsExchanges><ClaimsExchange Id="AppInsights-Start" TechnicalProfileReferenceId="AppInsights-Start" /></ClaimsExchanges></OrchestrationStep>
+    const OrchestrationStep = xmlDoc.createElement("OrchestrationStep")
+    OrchestrationStep.setAttribute("Type", "ClaimsExchange")
+
+    const ClaimsExchanges = xmlDoc.createElement("ClaimsExchanges")
+    const ClaimsExchange = xmlDoc.createElement("ClaimsExchange")
+    ClaimsExchange.setAttribute("Id", "AppInsights-Start")
+    ClaimsExchange.setAttribute("TechnicalProfileReferenceId", "AppInsights-Start")
+
+    OrchestrationStep.appendChild(ClaimsExchanges)
+    ClaimsExchanges.appendChild(ClaimsExchange)
+
+    ParentOrchestrationSteps[i].insertBefore(OrchestrationStep, ParentOrchestrationSteps[i].firstChild)
+  }
+
+  return xmlDoc.documentElement.toString()
+}
+
+// Renumber documents' user journeys, or sub journeys
+function renumberOrchestrationSteps(xmlStringDocument: string) {
+
+  const xmlDoc = new DOMParser().parseFromString(xmlStringDocument, "application/xml")
+  const UserJourneys = xmlDoc.getElementsByTagName("UserJourney")
+
+  for (let uj = 0; uj < UserJourneys.length; uj++) {
+    const OrchestrationSteps = UserJourneys[uj].getElementsByTagName("OrchestrationStep")
+
+    if (OrchestrationSteps !== null && OrchestrationSteps !== undefined) {
+      for (let os = 0; os < OrchestrationSteps.length; os++) {
+        OrchestrationSteps[os].setAttribute("Order", os + 1)
+      }
+    }
+  }
+
+  return xmlDoc.documentElement.toString()
 }
 
 run()

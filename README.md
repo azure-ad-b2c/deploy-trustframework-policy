@@ -27,6 +27,7 @@ jobs:
         tenant: ${{ env.tenant }}
         clientId: ${{ env.clientId }}
         clientSecret: ${{ secrets.clientSecret }}
+        renumberSteps: false
 ```
 
 ## Developer notes
