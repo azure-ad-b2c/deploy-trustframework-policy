@@ -22,7 +22,7 @@ async function run(): Promise<void> {
     const renumberSteps = core.getInput('renumberSteps')
 
 
-    core.info('Deploy custom policy GitHub Action v5.1 started.')
+    core.info('Deploy custom policy GitHub Action v5.2 started.')
 
     if (clientId === 'test') {
       core.info('GitHub Action test successfully completed.')
@@ -105,6 +105,8 @@ async function run(): Promise<void> {
           policyXML = renumberOrchestrationSteps(policyXML)
         }
 
+        //core.info(policyXML)
+
         const fileStream = new Readable()
         fileStream.push(policyXML)
         fileStream.push(null)      // Indicates end of file/stream
@@ -131,11 +133,17 @@ function addAppInsightsOrchestrationStep(xmlStringDocument: string) {
 
   const xmlDoc = new DOMParser().parseFromString(xmlStringDocument, "application/xml")
 
-  const ParentOrchestrationSteps = xmlDoc.getElementsByTagName("OrchestrationSteps")
-  for (let i = 0; i < ParentOrchestrationSteps.length; i++) {
+
+  const UserJourneys = xmlDoc.getElementsByTagName("UserJourney")
+
+  // Iterate through all user journeys
+  for (let uj = 0; uj < UserJourneys.length; uj++) {
+    const ParentOrchestrationSteps = UserJourneys[uj].getElementsByTagName("OrchestrationSteps")
+
     //<OrchestrationStep Order="1" Type="ClaimsExchange"><ClaimsExchanges><ClaimsExchange Id="AppInsights-Start" TechnicalProfileReferenceId="AppInsights-Start" /></ClaimsExchanges></OrchestrationStep>
     const OrchestrationStep = xmlDoc.createElement("OrchestrationStep")
     OrchestrationStep.setAttribute("Type", "ClaimsExchange")
+    OrchestrationStep.setAttribute("Order", "1")
 
     const ClaimsExchanges = xmlDoc.createElement("ClaimsExchanges")
     const ClaimsExchange = xmlDoc.createElement("ClaimsExchange")
@@ -144,8 +152,9 @@ function addAppInsightsOrchestrationStep(xmlStringDocument: string) {
 
     OrchestrationStep.appendChild(ClaimsExchanges)
     ClaimsExchanges.appendChild(ClaimsExchange)
-
-    ParentOrchestrationSteps[i].insertBefore(OrchestrationStep, ParentOrchestrationSteps[i].firstChild)
+    
+    // There is only one OrchestrationSteps element in a UserJourney, add the new element at the first place
+    ParentOrchestrationSteps[0].insertBefore(OrchestrationStep, ParentOrchestrationSteps[0].firstChild)
   }
 
   return xmlDoc.documentElement.toString()
