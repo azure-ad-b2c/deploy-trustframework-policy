@@ -88,53 +88,95 @@ const Readable = __nccwpck_require__(2413).Readable;
 const fg = __nccwpck_require__(3664);
 // XML parsing
 const { DOMParser } = __nccwpck_require__(7286);
+var DeploymentType;
+(function (DeploymentType) {
+    DeploymentType[DeploymentType["None"] = 0] = "None";
+    DeploymentType[DeploymentType["All"] = 1] = "All";
+    DeploymentType[DeploymentType["CommaDelimiter"] = 2] = "CommaDelimiter";
+    DeploymentType[DeploymentType["JSON"] = 3] = "JSON";
+})(DeploymentType || (DeploymentType = {}));
+class Settings {
+    constructor() {
+        this.folder = '';
+        this.tenant = '';
+        this.clientId = '';
+        this.clientSecret = '';
+        this.addAppInsightsStep = false;
+        this.renumberSteps = false;
+        this.verbose = false;
+    }
+}
 function run() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
+        const settings = new Settings();
         try {
-            const folder = core.getInput('folder');
-            const files = core.getInput('files');
-            const tenant = core.getInput('tenant');
-            const clientId = core.getInput('clientId');
-            const clientSecret = core.getInput('clientSecret');
-            const addAppInsightsStep = core.getInput('addAppInsightsStep');
-            const renumberSteps = core.getInput('renumberSteps');
-            core.info('Deploy custom policy GitHub Action v5.2 started.');
-            if (clientId === 'test') {
+            settings.folder = core.getInput('folder');
+            settings.files = core.getInput('files');
+            settings.tenant = core.getInput('tenant');
+            settings.clientId = core.getInput('clientId');
+            settings.clientSecret = core.getInput('clientSecret');
+            settings.addAppInsightsStep = core.getInput('addAppInsightsStep') === true || core.getInput('addAppInsightsStep') === 'true';
+            settings.renumberSteps = core.getInput('renumberSteps') === true || core.getInput('renumberSteps') === 'true';
+            settings.verbose = core.getInput('verbose') === true || core.getInput('verbose') === 'true';
+            let deploymentType = DeploymentType.None;
+            core.info('Deploy custom policy GitHub Action v5.3 started.');
+            if (settings.clientId === 'test') {
                 core.info('GitHub Action test successfully completed.');
                 return;
             }
-            if (clientId === null || clientId === undefined || clientId === '') {
+            if (settings.clientId === '') {
                 core.setFailed("The 'clientId' parameter is missing.");
             }
-            if (folder === null || folder === undefined || folder === '') {
+            if (settings.folder === '') {
                 core.setFailed("The 'folder' parameter is missing.");
             }
-            if (files === null || files === undefined || files === '') {
+            if (settings.files === '') {
                 core.setFailed("The 'files' parameter is missing.");
             }
-            if (tenant === null || tenant === undefined || tenant === '') {
+            if (settings.tenant === '') {
                 core.setFailed("The 'tenant' parameter is missing.");
             }
-            if (clientSecret === null || clientSecret === undefined || clientSecret === '') {
+            if (settings.clientSecret === '') {
                 core.setFailed(`The 'clientSecret' parameter is missing.`);
             }
+            // Print the input parameters
+            if (settings.verbose)
+                core.info(JSON.stringify(settings));
+            // Create OAuth2 client
             const client = microsoft_graph_client_1.Client.initWithMiddleware({
-                authProvider: new auth_1.ClientCredentialsAuthProvider(tenant, clientId, clientSecret),
+                authProvider: new auth_1.ClientCredentialsAuthProvider(settings.tenant, settings.clientId, settings.clientSecret),
                 defaultVersion: 'beta'
             });
             // Create an array of policy files
-            let filesArray = files.split(",");
-            if (files === "*") {
-                filesArray = yield fg([`${folder}/**/*.xml`], { dot: true });
+            let filesArray = settings.files.split(",");
+            if (settings.files === "*") {
+                deploymentType = DeploymentType.All;
+                filesArray = yield fg([`${settings.folder}/**/*.xml`], { dot: true });
             }
+            else if (settings.files.indexOf(".json") > 0) {
+                deploymentType = DeploymentType.JSON;
+                if (!fs.existsSync(`.github/workflows/${settings.files}`)) {
+                    core.setFailed(`Can't find the .github/workflows/${settings.files} file`);
+                }
+                const deploymentFile = fs.readFileSync(`.github/workflows/${settings.files}`);
+                const deploymentJson = JSON.parse(deploymentFile);
+                filesArray = deploymentJson.files;
+            }
+            else {
+                deploymentType = DeploymentType.CommaDelimiter;
+            }
+            core.info(`Deployment type: ${DeploymentType[deploymentType]}.`);
             for (const f of filesArray) {
                 let filePath = '';
-                if (files === "*") {
+                if (deploymentType === DeploymentType.All) {
                     filePath = f.trim();
                 }
-                else {
-                    filePath = path.join(folder, f.trim());
+                else if (deploymentType === DeploymentType.JSON) {
+                    filePath = path.join(settings.folder, f.path.trim());
+                }
+                else if (deploymentType === DeploymentType.CommaDelimiter) {
+                    filePath = path.join(settings.folder, f.trim());
                 }
                 if (filePath.length > 0 && fs.existsSync(filePath)) {
                     // Get the policy name
@@ -147,17 +189,24 @@ function run() {
                     // Replace yourtenant.onmicrosoft.com with the tenant name parameter
                     if (policyXML.indexOf("yourtenant.onmicrosoft.com") > 0) {
                         //core.info(`Policy ${filePath} replacing yourtenant.onmicrosoft.com with ${tenant}.`)
-                        policyXML = policyXML.replace(new RegExp("yourtenant.onmicrosoft.com", "gi"), tenant);
+                        policyXML = policyXML.replace(new RegExp("yourtenant.onmicrosoft.com", "gi"), settings.tenant);
+                    }
+                    // Use the deployment JSON file to find and replace in the custom policy file
+                    if (deploymentType === DeploymentType.JSON && f.replacements !== undefined) {
+                        for (const r of f.replacements) {
+                            policyXML = policyXML.replace(new RegExp(r.find, "gi"), r.replace);
+                        }
                     }
                     // Add Azure AppInsights orchestration step at the begging of the collection
-                    if (addAppInsightsStep !== null && addAppInsightsStep !== undefined || addAppInsightsStep === true) {
+                    if (settings.addAppInsightsStep) {
                         policyXML = addAppInsightsOrchestrationStep(policyXML);
                     }
                     // Renumber the orchestration steps
-                    if (renumberSteps !== null && renumberSteps !== undefined || renumberSteps === true) {
+                    if (settings.renumberSteps) {
                         policyXML = renumberOrchestrationSteps(policyXML);
                     }
-                    //core.info(policyXML)
+                    if (settings.verbose)
+                        core.info(policyXML);
                     const fileStream = new Readable();
                     fileStream.push(policyXML);
                     fileStream.push(null); // Indicates end of file/stream
