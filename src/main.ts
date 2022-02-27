@@ -12,20 +12,21 @@ const fg = require('fast-glob')
 const { DOMParser } = require('xmldom')
 
 enum DeploymentType {
+  None,
   All,
   CommaDelimiter,
   JSON
 }
 
 class Settings {
-  public folder: string = ''
+  folder = ''
   files: any
-  tenant: string = ''
-  clientId: string = ''
-  clientSecret: string = ''
-  addAppInsightsStep: boolean = false
-  renumberSteps: boolean = false
-  verbose: boolean = false
+  tenant = ''
+  clientId = ''
+  clientSecret = ''
+  addAppInsightsStep = false
+  renumberSteps = false
+  verbose = false
 }
 
 async function run(): Promise<void> {
@@ -40,7 +41,7 @@ async function run(): Promise<void> {
     settings.addAppInsightsStep = core.getInput('addAppInsightsStep')  === true || core.getInput('addAppInsightsStep') === 'true'
     settings.renumberSteps = core.getInput('renumberSteps')  === true || core.getInput('renumberSteps') === 'true'
     settings.verbose = core.getInput('verbose')  === true || core.getInput('verbose') === 'true'
-    let deploymentType: DeploymentType
+    let deploymentType = DeploymentType.None
 
     core.info('Deploy custom policy GitHub Action v5.3 started.')
 
@@ -97,8 +98,8 @@ async function run(): Promise<void> {
         core.setFailed(`Can't find the .github/workflows/${settings.files} file`)
       }
 
-      const deploymentFile = fs.readFileSync(`.github/workflows/${settings.files}`);
-      const deploymentJson = JSON.parse(deploymentFile);
+      const deploymentFile = fs.readFileSync(`.github/workflows/${settings.files}`)
+      const deploymentJson = JSON.parse(deploymentFile)
 
       filesArray = deploymentJson.files
     }

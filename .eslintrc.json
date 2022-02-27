@@ -8,6 +8,7 @@
       "project": "./tsconfig.json"
     },
     "rules": {
+      "no-shadow": "off",
       "i18n-text/no-en": 0,
       "import/named": "warn",
       "github/no-then": "warn",

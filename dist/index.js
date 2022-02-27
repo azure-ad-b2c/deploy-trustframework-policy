@@ -90,9 +90,10 @@ const fg = __nccwpck_require__(3664);
 const { DOMParser } = __nccwpck_require__(7286);
 var DeploymentType;
 (function (DeploymentType) {
-    DeploymentType[DeploymentType["All"] = 0] = "All";
-    DeploymentType[DeploymentType["CommaDelimiter"] = 1] = "CommaDelimiter";
-    DeploymentType[DeploymentType["JSON"] = 2] = "JSON";
+    DeploymentType[DeploymentType["None"] = 0] = "None";
+    DeploymentType[DeploymentType["All"] = 1] = "All";
+    DeploymentType[DeploymentType["CommaDelimiter"] = 2] = "CommaDelimiter";
+    DeploymentType[DeploymentType["JSON"] = 3] = "JSON";
 })(DeploymentType || (DeploymentType = {}));
 class Settings {
     constructor() {
@@ -118,7 +119,7 @@ function run() {
             settings.addAppInsightsStep = core.getInput('addAppInsightsStep') === true || core.getInput('addAppInsightsStep') === 'true';
             settings.renumberSteps = core.getInput('renumberSteps') === true || core.getInput('renumberSteps') === 'true';
             settings.verbose = core.getInput('verbose') === true || core.getInput('verbose') === 'true';
-            let deploymentType;
+            let deploymentType = DeploymentType.None;
             core.info('Deploy custom policy GitHub Action v5.3 started.');
             if (settings.clientId === 'test') {
                 core.info('GitHub Action test successfully completed.');
