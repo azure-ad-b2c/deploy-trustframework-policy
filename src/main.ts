@@ -1,7 +1,5 @@
 // Polyfill for graph client
 import { Client } from '@microsoft/microsoft-graph-client'
-import { convertPatternGroupsToTasks } from 'fast-glob/out/managers/tasks';
-import { connected } from 'process';
 import { ClientCredentialsAuthProvider } from './auth'; const core = require('@actions/core')
 const fs = require('fs')
 const path = require('path')
