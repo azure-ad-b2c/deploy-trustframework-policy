@@ -23,9 +23,15 @@ inputs:
   renumberSteps:
     description: 'Renumber the orchestration steps. Possible values: true, or false'
     required: false
+    default: 'false'
   addAppInsightsStep:
     description: 'Add App Insights orchestration steps to the the user journeys.'
     required: false
+    default: 'false'
+  verbose:
+    description: 'Log level verbose.'
+    required: false
+    default: 'false'
 runs:
   using: 'node12'
   main: 'dist/index.js'
