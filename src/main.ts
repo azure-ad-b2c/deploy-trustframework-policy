@@ -38,9 +38,9 @@ async function run(): Promise<void> {
     settings.tenant = core.getInput('tenant')
     settings.clientId = core.getInput('clientId')
     settings.clientSecret = core.getInput('clientSecret')
-    settings.addAppInsightsStep = core.getInput('addAppInsightsStep')  === true || core.getInput('addAppInsightsStep') === 'true'
-    settings.renumberSteps = core.getInput('renumberSteps')  === true || core.getInput('renumberSteps') === 'true'
-    settings.verbose = core.getInput('verbose')  === true || core.getInput('verbose') === 'true'
+    settings.addAppInsightsStep = core.getInput('addAppInsightsStep') === true || core.getInput('addAppInsightsStep') === 'true'
+    settings.renumberSteps = core.getInput('renumberSteps') === true || core.getInput('renumberSteps') === 'true'
+    settings.verbose = core.getInput('verbose') === true || core.getInput('verbose') === 'true'
     let deploymentType = DeploymentType.None
 
     core.info('Deploy custom policy GitHub Action v5.3 started.')
@@ -137,7 +137,6 @@ async function run(): Promise<void> {
 
         // Replace yourtenant.onmicrosoft.com with the tenant name parameter
         if (policyXML.indexOf("yourtenant.onmicrosoft.com") > 0) {
-          //core.info(`Policy ${filePath} replacing yourtenant.onmicrosoft.com with ${tenant}.`)
           policyXML = policyXML.replace(new RegExp("yourtenant.onmicrosoft.com", "gi"), settings.tenant)
         }
 
@@ -178,6 +177,8 @@ async function run(): Promise<void> {
     }
 
   } catch (error: any) {
+    core.info(`Deployment Failed`)
+    core.info(error)
     const errorText = error.message ?? error
     core.setFailed(errorText)
   }
