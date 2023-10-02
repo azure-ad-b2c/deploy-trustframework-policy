@@ -20,6 +20,10 @@ inputs:
   clientSecret:
     description: 'The application Secret for a service principal which will be used to authenticate to the Microsoft Graph'
     required: true
+  scopes:
+    description: 'The scope for a service principal which will be used to authenticate to the Microsoft Graph'
+    required: false
+    default: '['https://graph.microsoft.com/.default']'
   renumberSteps:
     description: 'Renumber the orchestration steps. Possible values: true, or false'
     required: false
