@@ -19,7 +19,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ClientCredentialsAuthProvider = void 0;
 const openid_client_1 = __nccwpck_require__(3140);
 class ClientCredentialsAuthProvider {
-    constructor(tenant, clientId, clientSecret, scopes = [ClientCredentialsAuthProvider.defaultScope]) {
+    constructor(tenant, clientId, clientSecret, scopes) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.scopes = scopes;
@@ -56,7 +56,6 @@ class ClientCredentialsAuthProvider {
     }
 }
 exports.ClientCredentialsAuthProvider = ClientCredentialsAuthProvider;
-ClientCredentialsAuthProvider.defaultScope = "https://graph.microsoft.com/.default";
 
 
 /***/ }),
@@ -101,6 +100,7 @@ class Settings {
         this.tenant = '';
         this.clientId = '';
         this.clientSecret = '';
+        this.scopes = ['https://graph.microsoft.com/.default'];
         this.addAppInsightsStep = false;
         this.renumberSteps = false;
         this.verbose = false;
@@ -116,6 +116,7 @@ function run() {
             settings.tenant = core.getInput('tenant');
             settings.clientId = core.getInput('clientId');
             settings.clientSecret = core.getInput('clientSecret');
+            settings.scopes = core.getInput('scope');
             settings.addAppInsightsStep = core.getInput('addAppInsightsStep') === true || core.getInput('addAppInsightsStep') === 'true';
             settings.renumberSteps = core.getInput('renumberSteps') === true || core.getInput('renumberSteps') === 'true';
             settings.verbose = core.getInput('verbose') === true || core.getInput('verbose') === 'true';
@@ -145,7 +146,7 @@ function run() {
                 core.info(JSON.stringify(settings));
             // Create OAuth2 client
             const client = microsoft_graph_client_1.Client.initWithMiddleware({
-                authProvider: new auth_1.ClientCredentialsAuthProvider(settings.tenant, settings.clientId, settings.clientSecret),
+                authProvider: new auth_1.ClientCredentialsAuthProvider(settings.tenant, settings.clientId, settings.clientSecret, settings.scopes),
                 defaultVersion: 'beta'
             });
             // Create an array of policy files

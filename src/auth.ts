@@ -2,8 +2,6 @@ import { Client, Issuer, TokenSet } from "openid-client"
 import { AuthenticationProvider } from "@microsoft/microsoft-graph-client"
 
 export class ClientCredentialsAuthProvider implements AuthenticationProvider {
-  private static defaultScope = "https://graph.microsoft.com/.default"
-
   private authClient: Promise<Client>
   private cachedToken: TokenSet | null = null
 
@@ -11,7 +9,7 @@ export class ClientCredentialsAuthProvider implements AuthenticationProvider {
     tenant: string,
     private clientId: string,
     private clientSecret: string,
-    private scopes = [ClientCredentialsAuthProvider.defaultScope]
+    private scopes: string[]
   ) {
     this.authClient = Issuer.discover(
       `https://login.microsoftonline.com/${tenant}/v2.0/.well-known/openid-configuration`
